@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>La Urbana · Música para vender</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      min-height: 100vh;
+      background: #f4eddc;
+      background-image:
+        radial-gradient(ellipse at 15% 20%, rgba(196,122,42,0.07) 0%, transparent 55%),
+        radial-gradient(ellipse at 85% 80%, rgba(140,90,30,0.05) 0%, transparent 55%);
+      font-family: 'Crimson Text', Georgia, serif;
+      color: #1e1508;
+    }
+    .wrap { max-width: 760px; margin: 0 auto; padding: 44px 22px 72px; }
+
+    .header { text-align: center; margin-bottom: 44px; }
+    .eyebrow { font-size: 10px; letter-spacing: 5px; text-transform: uppercase; color: #c47a2a; margin-bottom: 10px; }
+    .title { font-family: 'Playfair Display', Georgia, serif; font-size: clamp(32px, 7vw, 56px); font-weight: 400; color: #1e1508; line-height: 1.08; margin-bottom: 10px; }
+    .title em { font-style: italic; color: #c47a2a; }
+    .rule { width: 52px; height: 1px; background: linear-gradient(90deg, transparent, #c47a2a, transparent); margin: 14px auto; }
+    .subtitle { font-size: 16px; color: #7a6040; font-style: italic; }
+
+    .section-label { font-size: 10px; letter-spacing: 4px; text-transform: uppercase; color: #b09060; margin-bottom: 12px; }
+    .divider { height: 1px; background: linear-gradient(90deg, transparent, #d8c898, transparent); margin: 4px 0 28px; }
+
+    .day-scroll { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 32px; }
+    .pill {
+      padding: 8px 18px; border-radius: 30px;
+      border: 1.5px solid #d8c898; background: transparent;
+      font-family: 'Crimson Text', Georgia, serif; font-size: 15px;
+      color: #7a6040; cursor: pointer; transition: all 0.18s; white-space: nowrap;
+    }
+    .pill:hover { border-color: #c47a2a; color: #c47a2a; }
+    .pill.active { background: #1e1508; border-color: #1e1508; color: #f5e6c0; }
+
+    .slots-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 32px; }
+    .slot-card {
+      padding: 14px 12px; border-radius: 8px;
+      border: 1.5px solid #d8c898; background: rgba(255,255,255,0.35);
+      cursor: pointer; transition: all 0.18s; text-align: left;
+    }
+    .slot-card:hover { border-color: #c47a2a; }
+    .slot-card.active { background: #fffaf0; border-color: #c47a2a; box-shadow: 0 2px 14px rgba(196,122,42,0.18); }
+    .slot-header { display: flex; align-items: center; gap: 8px; margin-bottom: 3px; }
+    .slot-icon { font-size: 15px; }
+    .slot-name { font-family: 'Crimson Text', Georgia, serif; font-size: 14px; font-weight: 600; color: #1e1508; }
+    .slot-hours { font-size: 11px; color: #a08050; font-style: italic; margin-bottom: 5px; }
+    .slot-kitchen { font-size: 10px; letter-spacing: 0.5px; }
+    .slot-kitchen.open { color: #5a8a3a; }
+    .slot-kitchen.closed { color: #9a6040; }
+
+    .obj-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 32px; }
+    .card {
+      padding: 14px 10px 12px; border-radius: 8px;
+      border: 1.5px solid #d8c898; background: rgba(255,255,255,0.35);
+      cursor: pointer; transition: all 0.18s; text-align: center;
+    }
+    .card:hover { border-color: #c47a2a; }
+    .card.active { background: #fffaf0; border-color: #c47a2a; box-shadow: 0 2px 14px rgba(196,122,42,0.18); }
+    .card-icon { font-size: 20px; margin-bottom: 5px; }
+    .card-name { font-family: 'Crimson Text', Georgia, serif; font-size: 13px; color: #7a6040; line-height: 1.3; }
+    .card.active .card-name { color: #1e1508; }
+
+    .age-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 40px; }
+    .age-btn {
+      padding: 6px 16px; border-radius: 20px;
+      border: 1.5px solid #d8c898; background: transparent;
+      font-family: 'Crimson Text', Georgia, serif; font-size: 14px;
+      color: #7a6040; cursor: pointer; transition: all 0.18s;
+    }
+    .age-btn:hover { border-color: #c47a2a; color: #c47a2a; }
+    .age-btn.active { background: #c47a2a; border-color: #c47a2a; color: #fff8ec; }
+
+    .result {
+      background: #1a1208; border-radius: 10px;
+      padding: 30px 32px; margin-bottom: 18px;
+      position: relative; overflow: hidden;
+    }
+    .result::before {
+      content: ''; position: absolute; top: -50px; right: -50px;
+      width: 200px; height: 200px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(196,122,42,0.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .result-inner { position: relative; z-index: 1; }
+    .result-context { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: #c47a2a; margin-bottom: 18px; line-height: 1.6; }
+    .bpm-row { display: flex; align-items: baseline; gap: 14px; margin-bottom: 18px; flex-wrap: wrap; }
+    .bpm-big { font-family: 'Playfair Display', Georgia, serif; font-size: 52px; color: #f5e6c0; line-height: 1; }
+    .bpm-label { font-size: 13px; color: #7a6040; font-style: italic; }
+    .energy-bar { display: flex; gap: 5px; align-items: center; margin-left: 8px; }
+    .energy-seg { width: 22px; height: 7px; border-radius: 2px; }
+    .energy-txt { font-size: 11px; color: #9a8060; margin-left: 6px; font-style: italic; }
+    .genres { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+    .genre-tag { padding: 4px 14px; border-radius: 20px; border: 1px solid rgba(196,122,42,0.35); color: #d4a855; font-size: 13px; font-family: 'Crimson Text', Georgia, serif; }
+    .avoid { font-size: 13px; color: #4a3a1a; font-style: italic; margin-bottom: 20px; }
+    .avoid span { color: #7a5a28; }
+    .tip-box { border-left: 2px solid #c47a2a; padding-left: 16px; margin-bottom: 16px; }
+    .tip-text { font-size: 17px; color: #e8d8b0; font-style: italic; line-height: 1.55; font-family: 'Playfair Display', Georgia, serif; }
+    .age-note { background: rgba(196,122,42,0.08); border: 1px solid rgba(196,122,42,0.18); border-radius: 6px; padding: 10px 14px; font-size: 14px; color: #9a8060; font-style: italic; margin-bottom: 12px; }
+    .kitchen-badge { display: inline-block; padding: 5px 14px; border-radius: 20px; font-size: 11px; letter-spacing: 0.5px; }
+    .kitchen-badge.open { background: rgba(90,138,58,0.15); color: #5a8a3a; border: 1px solid rgba(90,138,58,0.3); }
+    .kitchen-badge.closed { background: rgba(154,96,64,0.15); color: #9a6040; border: 1px solid rgba(154,96,64,0.3); }
+
+    .copy-btn {
+      width: 100%; padding: 16px; border-radius: 7px; border: none;
+      background: linear-gradient(135deg, #c47a2a, #a85e18);
+      color: #fff8ec; font-family: 'Playfair Display', Georgia, serif;
+      font-size: 17px; cursor: pointer; transition: all 0.2s; letter-spacing: 0.3px;
+    }
+    .copy-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(196,122,42,0.35); }
+    .copy-btn.done { background: linear-gradient(135deg, #3a6a3a, #2a5a2a); }
+
+    .footer { text-align: center; margin-top: 40px; font-size: 11px; color: #a09060; font-style: italic; letter-spacing: 1px; }
+
+    @media (max-width: 520px) {
+      .obj-grid { grid-template-columns: repeat(2, 1fr); }
+      .bpm-big { font-size: 40px; }
+      .result { padding: 22px 18px; }
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="header">
+    <p class="eyebrow">La Urbana · A Coruña</p>
+    <h1 class="title">Música <em>para vender</em></h1>
+    <div class="rule"></div>
+    <p class="subtitle">Selecciona el contexto · obtén el perfil musical exacto</p>
+  </div>
+
+  <p class="section-label">Día de servicio</p>
+  <div class="day-scroll" id="days"></div>
+  <div class="divider"></div>
+
+  <p class="section-label">Franja horaria</p>
+  <div class="slots-grid" id="slots"></div>
+  <div class="divider"></div>
+
+  <p class="section-label">Objetivo de la lista</p>
+  <div class="obj-grid" id="objectives"></div>
+  <div class="divider"></div>
+
+  <p class="section-label">Perfil de clientela</p>
+  <div class="age-row" id="ages"></div>
+
+  <div class="result" id="result"></div>
+  <button class="copy-btn" id="copyBtn" onclick="copyPrompt()">Copiar prompt para generar la lista</button>
+
+  <p class="footer">Herramienta interna · La Urbana · 2025–2026</p>
+</div>
+
+<script>
+const DAYS = [
+  {id:"lunes",    label:"Lunes",     weekend:false},
+  {id:"martes",   label:"Martes",    weekend:false},
+  {id:"miercoles",label:"Miércoles", weekend:false},
+  {id:"jueves",   label:"Jueves",    weekend:false},
+  {id:"viernes",  label:"Viernes",   weekend:false},
+  {id:"sabado",   label:"Sábado",    weekend:true},
+  {id:"domingo",  label:"Domingo",   weekend:true},
+];
+
+const SLOTS_WEEK = [
+  {id:"tarde",  label:"Tarde",      hours:"17–19h", icon:"☀️", kitchen:false},
+  {id:"cena",   label:"Cena",       hours:"19–23h", icon:"🍽️",kitchen:true},
+  {id:"copas",  label:"Copas",      hours:"23h–2h", icon:"🥃", kitchen:false},
+];
+
+const SLOTS_WEEKEND = [
+  {id:"apertura", label:"Apertura",  hours:"12–13h", icon:"🌅", kitchen:false},
+  {id:"comida",   label:"Comida",    hours:"13–16h", icon:"🍽️",kitchen:true},
+  {id:"tarde",    label:"Tarde",     hours:"16–19h", icon:"☀️", kitchen:false},
+  {id:"cena",     label:"Cena",      hours:"19–23h", icon:"🍽️",kitchen:true},
+  {id:"copas",    label:"Copas",     hours:"23h–3h", icon:"🥃", kitchen:false},
+];
+
+const OBJECTIVES = [
+  {id:"vino",         label:"Vino / Vermú",      icon:"🍷"},
+  {id:"cerveza",      label:"Cerveza",            icon:"🍺"},
+  {id:"destilados",   label:"Copas / Destilados", icon:"🥃"},
+  {id:"sobremesa",    label:"Alargar sobremesa",  icon:"⏳"},
+  {id:"bailar",       label:"Bailar / Fiesta",    icon:"💃"},
+  {id:"tranquilidad", label:"Ambiente tranquilo", icon:"🌿"},
+];
+
+const AGE = [
+  {id:"mix",      label:"Mix 30–60"},
+  {id:"jovenes",  label:"Jóvenes 20–35"},
+  {id:"adultos",  label:"Adultos 40–60"},
+  {id:"mayores",  label:"Mayores 60+"},
+  {id:"familiar", label:"Familiar"},
+];
+
+const P = {
+  sincocina:{
+    vino:        {bpm:"65–80",  e:2, g:["Jazz ligero","Bossa nova","Soul suave","Folk acústico"],     av:"EDM, reggaeton, pop festivo",    tip:"El cliente viene a sentarse y beber. Que el vermú mande. Sin prisas."},
+    cerveza:     {bpm:"80–95",  e:3, g:["Indie español","Pop desenfadado","Rock suave"],              av:"Ópera, clásica, copla",           tip:"Caña en mano, conversación en marcha. Fresco y social."},
+    destilados:  {bpm:"100–118",e:4, g:["Pop 90–2000s","Latin pop","R&B festivo","Funk"],             av:"Folk lento, música triste",        tip:"Sin mesa que respetar. Sube la temperatura, empuja la copa."},
+    sobremesa:   {bpm:"55–70",  e:1, g:["Bossa nova","Jazz vocal","Pop acústico español"],            av:"Cualquier cosa > 95 BPM",         tip:"Que nadie mire el reloj. La cuenta puede esperar."},
+    bailar:      {bpm:"108–128",e:5, g:["Disco clásico","Latin pop","Pop festivo","Funk bailable"],   av:"Música lenta o introspectiva",    tip:"Sin mesas que bloqueen. Si hay ganas de moverse, que se muevan."},
+    tranquilidad:{bpm:"55–70",  e:1, g:["Clásica ligera","Acoustic covers","Folk atlántico","Jazz"],  av:"Nada > 85 BPM",                  tip:"Modo hogar. La música casi no existe. Confort puro."},
+  },
+  concocina:{
+    vino:        {bpm:"68–82",  e:2, g:["Soul","Jazz con swing","Pop francés","Bossa nova animada"],  av:"Rock duro, reggaeton",            tip:"Mesa llena, segunda botella en juego. No rompas el hechizo."},
+    cerveza:     {bpm:"82–98",  e:3, g:["Rock clásico","Pop español 90s","Indie","Britpop"],          av:"Clásica, copla",                  tip:"Ronda va, ronda viene. Ritmo natural sin urgencia."},
+    destilados:  {bpm:"92–108", e:3, g:["R&B mid-tempo","Funk","Pop 2000s","Soul"],                   av:"Folk lento",                      tip:"Transición de mesa a barra. Sube la temperatura sin romper."},
+    sobremesa:   {bpm:"58–73",  e:2, g:["Jazz vocal","Bossa nova","Boleros modernos","Pop acústico"], av:"> 92 BPM",                        tip:"Quien se queda en mesa quiere quedarse. No lo espantes."},
+    bailar:      {bpm:"102–118",e:4, g:["Pop festivo","Latin","Disco suave","Funk bailable"],         av:"Música lenta o introspectiva",    tip:"Que la energía suba sin molestar a quien todavía come."},
+    tranquilidad:{bpm:"62–78",  e:2, g:["Pop acústico","Folk","Jazz ligero","Clásica ligera"],        av:"> 92 BPM",                        tip:"La cocina trabaja. El ambiente acompaña sin protagonismo."},
+  },
+};
+
+const AGE_NOTES = {
+  mix:      "Clásicos transversales. Que nadie se sienta fuera de lugar.",
+  jovenes:  "Música actual e indie. Sin cosas de sus padres.",
+  adultos:  "Soul, rock clásico, pop 90–2010. Referencias sólidas.",
+  mayores:  "Melodías reconocibles. Boleros, copla moderna, ritmos suaves.",
+  familiar: "Sin letras polémicas. Neutral y agradable para todos.",
+};
+
+const EL = ["","Muy suave","Suave","Media","Alta","Máxima"];
+const EC = ["","hsl(38,68%,54%)","hsl(46,68%,50%)","hsl(28,68%,46%)","hsl(20,68%,40%)","hsl(14,68%,34%)"];
+
+let S = {day:"viernes", slot:"cena", obj:"vino", age:"mix"};
+
+function isWeekend(){ return S.day==="sabado"||S.day==="domingo"; }
+function getSlots(){ return isWeekend()?SLOTS_WEEKEND:SLOTS_WEEK; }
+function getSlotData(){ return getSlots().find(s=>s.id===S.slot); }
+function getProfile(){
+  const sd=getSlotData(); if(!sd) return null;
+  return P[sd.kitchen?"concocina":"sincocina"]?.[S.obj];
+}
+
+function render(){
+  // Days
+  document.getElementById("days").innerHTML=DAYS.map(d=>
+    `<button class="pill${S.day===d.id?" active":""}" onclick="sd('day','${d.id}')">${d.label}</button>`
+  ).join("");
+
+  // Fix slot if not in current day
+  const slots=getSlots();
+  if(!slots.find(s=>s.id===S.slot)) S.slot=slots[0].id;
+
+  // Slots
+  document.getElementById("slots").innerHTML=slots.map(s=>
+    `<button class="slot-card${S.slot===s.id?" active":""}" onclick="sd('slot','${s.id}')">
+      <div class="slot-header"><span class="slot-icon">${s.icon}</span><span class="slot-name">${s.label}</span></div>
+      <div class="slot-hours">${s.hours}</div>
+      <div class="slot-kitchen ${s.kitchen?"open":"closed"}">${s.kitchen?"▲ Cocina abierta":"○ Solo bebida"}</div>
+    </button>`
+  ).join("");
+
+  // Objectives
+  document.getElementById("objectives").innerHTML=OBJECTIVES.map(o=>
+    `<button class="card${S.obj===o.id?" active":""}" onclick="sd('obj','${o.id}')">
+      <div class="card-icon">${o.icon}</div>
+      <div class="card-name">${o.label}</div>
+    </button>`
+  ).join("");
+
+  // Ages
+  document.getElementById("ages").innerHTML=AGE.map(a=>
+    `<button class="age-btn${S.age===a.id?" active":""}" onclick="sd('age','${a.id}')">${a.label}</button>`
+  ).join("");
+
+  // Result
+  const p=getProfile();
+  const sd2=getSlotData();
+  const dayLabel=DAYS.find(d=>d.id===S.day)?.label;
+  const objLabel=OBJECTIVES.find(o=>o.id===S.obj)?.label;
+
+  if(p&&sd2){
+    const segs=[1,2,3,4,5].map(i=>
+      `<div class="energy-seg" style="width:22px;height:7px;border-radius:2px;background:${i<=p.e?EC[i]:"rgba(255,255,255,0.1)"}"></div>`
+    ).join("");
+    const badge=sd2.kitchen
+      ? `<div class="kitchen-badge open">🍳 Cocina abierta · respeta el ritmo de mesa</div>`
+      : `<div class="kitchen-badge closed">🥃 Solo bebida · puedes subir la energía</div>`;
+
+    document.getElementById("result").innerHTML=`
+      <div class="result-inner">
+        <p class="result-context">${dayLabel} · ${sd2.label} · ${sd2.hours} · ${objLabel}</p>
+        <div class="bpm-row">
+          <span class="bpm-big">${p.bpm}</span>
+          <span class="bpm-label">BPM</span>
+          <div class="energy-bar">${segs}<span class="energy-txt">${EL[p.e]}</span></div>
+        </div>
+        <div class="genres">${p.g.map(g=>`<span class="genre-tag">${g}</span>`).join("")}</div>
+        <p class="avoid">Evitar: <span>${p.av}</span></p>
+        <div class="tip-box"><p class="tip-text">"${p.tip}"</p></div>
+        <div class="age-note">👥 ${AGE_NOTES[S.age]}</div>
+        ${badge}
+      </div>`;
+  }
+}
+
+function sd(k,v){ S[k]=v; render(); }
+
+function copyPrompt(){
+  const p=getProfile(); const sd2=getSlotData();
+  if(!p||!sd2) return;
+  const dl=DAYS.find(d=>d.id===S.day)?.label;
+  const ol=OBJECTIVES.find(o=>o.id===S.obj);
+  const al=AGE.find(a=>a.id===S.age);
+  const kc=sd2.kitchen
+    ?"La cocina está abierta: hay mesas con comida, respeta el ritmo de mesa, no satures."
+    :"La cocina está cerrada: solo bebida en barra. Puedes subir la energía sin preocuparte por las mesas.";
+
+  const txt=`Eres el DJ residente de La Urbana, un bar de barrio en A Coruña. Espacio industrial con carácter, buen equipo de sonido profesional, barra de licores de nivel (Hendrick's, Barceló, whiskies, vermuts). Clientela fiel. No somos discoteca.
+
+CONTEXTO:
+- Día: ${dl}
+- Franja: ${sd2.label} (${sd2.hours})
+- Cocina: ${kc}
+- Objetivo: ${ol.label}
+- Clientela: ${al.label}
+- BPM objetivo: ${p.bpm}
+- Géneros que encajan: ${p.g.join(", ")}
+- Evitar: ${p.av}
+
+TAREA:
+Crea una lista de 18–22 canciones con esta lógica: ${p.tip}
+Nota de clientela: ${AGE_NOTES[S.age]}
+
+FORMATO:
+- Nombre creativo para la lista
+- Lista numerada: Artista — Canción (año)
+- Nota breve (2–3 líneas) explicando la selección`;
+
+  navigator.clipboard.writeText(txt).then(()=>{
+    const btn=document.getElementById("copyBtn");
+    btn.textContent="✓ Prompt copiado — pégalo en Claude o ChatGPT";
+    btn.classList.add("done");
+    setTimeout(()=>{ btn.textContent="Copiar prompt para generar la lista"; btn.classList.remove("done"); },2600);
+  });
+}
+
+render();
+</script>
+</body>
+</html>
